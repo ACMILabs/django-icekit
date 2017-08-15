@@ -10,6 +10,7 @@ import logging
 
 from icekit.admin_tools.previews import RawIdPreviewAdminMixin
 from icekit.admin_tools.utils import admin_link
+from icekit.redirects.admin import RedirectInline
 from icekit.utils.attributes import resolve
 
 from django.utils.translation import ugettext_lazy as _
@@ -70,6 +71,9 @@ class HeroMixinAdmin(RawIdPreviewAdminMixin):
 
 
 class ListableMixinAdmin(admin.ModelAdmin):
+
+    # inlines = [RedirectInline]
+
     FIELDSETS = (
         ('Advanced listing options', {
             'classes': ('collapse',),

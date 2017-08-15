@@ -343,10 +343,10 @@ WSGI_APPLICATION = 'icekit.project.wsgi.application'
 
 # Requires: django.contrib.sites
 
-INSTALLED_APPS += ('django.contrib.redirects', )
+INSTALLED_APPS += ('icekit.redirects', )
 
 MIDDLEWARE_CLASSES += (
-    'django.contrib.redirects.middleware.RedirectFallbackMiddleware',
+    'icekit.redirects.middleware.RedirectFallbackMiddleware',
 )
 
 # DJANGO SITES ################################################################

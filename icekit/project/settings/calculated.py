@@ -77,7 +77,7 @@ MIDDLEWARE_CLASSES = dedupe_and_sort(MIDDLEWARE_CLASSES, [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.cache.FetchFromCacheMiddleware',
     'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
-    'django.contrib.redirects.middleware.RedirectFallbackMiddleware',
+    'icekit.redirects.middleware.RedirectFallbackMiddleware',
 ])
 
 # Get the secret key from a file that should never be committed to version
