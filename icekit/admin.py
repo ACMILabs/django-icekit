@@ -7,7 +7,7 @@ from django.http import JsonResponse
 
 from icekit import models
 from icekit.admin_tools.mixins import RawIdPreviewAdminMixin, \
-    BetterDateTimeAdmin
+    BetterDateTimeAdmin, ListableMixinAdmin
 from django.db.models import DateTimeField, DateField, TimeField
 
 
@@ -104,6 +104,7 @@ class ICEkitContentsAdmin(
     PublishingAdmin,
     WorkflowMixinAdmin,
     RawIdPreviewAdminMixin,
+    ListableMixinAdmin,
 ):
     """
     A base for generic admins that will include ICEkit features:
@@ -117,7 +118,7 @@ class ICEkitContentsAdmin(
         WorkflowMixinAdmin.list_display
     list_filter = PublishingAdmin.list_filter + \
         WorkflowMixinAdmin.list_filter
-    inlines = [WorkflowStateTabularInline]
+    inlines = ListableMixinAdmin.inlines + [WorkflowStateTabularInline]
 
 
 class ICEkitFluentContentsAdmin(
@@ -125,15 +126,12 @@ class ICEkitFluentContentsAdmin(
     PublishableFluentContentsAdmin,
     WorkflowMixinAdmin,
     RawIdPreviewAdminMixin,
+    ListableMixinAdmin,
 ):
     """
-    A base for Fluent Contents admins that will include ICEkit features:
-
-     - publishing
-     - workflow
-     - Better date controls
-
+    Like the class above, but using Fluent Contents.
     """
+    # TODO: factor these classes to inherit more cleanly.
     list_display = ICEkitContentsAdmin.list_display
     list_filter = ICEkitContentsAdmin.list_filter
     inlines = ICEkitContentsAdmin.inlines

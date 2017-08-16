@@ -349,6 +349,10 @@ MIDDLEWARE_CLASSES += (
     'icekit.redirects.middleware.RedirectFallbackMiddleware',
 )
 
+# By default, redirect URLs are served from the last site in the `Site` table.
+# This can be chosen case by case, or set a new default here.
+# REDIRECT_SOURCE_SITE_ID = 1
+
 # DJANGO SITES ################################################################
 
 INSTALLED_APPS += ('django.contrib.sites', )

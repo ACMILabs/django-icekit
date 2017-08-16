@@ -1,26 +1,40 @@
-import string
+ALPHABET = "23456789abcdefghjkmnpqrstuvxyz" # removing ambiguous chars, and w, which is used to deprofane.
 
-ALPHABET = string.digits + string.lowercase
+# from https://stackoverflow.com/questions/3531746/what-s-a-good-python-profanity-filter-library
+# not including words that have chars that don't appear above. Replace the first character with 'w' to sacredify.
+PROFANITY = ['ass', 'cum', 'cunt', 'fuc', 'fuk', 'bj', 'nud', 'puss', 'rape', 'scat', 'sex',]
+CLEANED = [(p, 'w' + p[1:]) for p in PROFANITY]
 
-def base36encode(number):
-    """Converts a positive integer to a base36 string."""
+def baseXencode(number):
+    """Converts a positive integer to a baseX string."""
     if not isinstance(number, (int, long)):
         raise TypeError('`number` must be an integer')
 
-    base36 = ''
+    baseX = ''
 
     if 0 <= number < len(ALPHABET):
         return ALPHABET[number]
 
     while number != 0:
         number, i = divmod(number, len(ALPHABET))
-        base36 = ALPHABET[i] + base36
+        baseX = ALPHABET[i] + baseX
 
-    return base36
+    for p, q in CLEANED:
+        baseX = baseX.replace(p, q)
+
+    return baseX
 
 
-def base36decode(number):
-    return int(number, len(ALPHABET))
+# def baseXdecode(number):
+#     """
+#     NOTE: this isn't used or working, but is provided as a starting point.
+#
+#     TODO: subtract `mininmum_number` from the output.
+#
+#     TODO: Due to the profanity filter, inputs involving 'w' will need to be back-converted to the
+#     profane version.
+#     """
+#     return int(number, len(ALPHABET))
 
 
 def short_code_from_id(integer, min_length=2):
@@ -38,4 +52,4 @@ def short_code_from_id(integer, min_length=2):
     """
 
     minimum_number = len(ALPHABET) ** (min_length - 1)
-    return base36encode(integer + minimum_number)
+    return baseXencode(integer + minimum_number)

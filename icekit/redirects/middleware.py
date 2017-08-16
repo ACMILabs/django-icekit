@@ -30,12 +30,12 @@ class RedirectFallbackMiddleware(object):
         if response.status_code != 404:
             return response
 
-        full_path = request.get_full_path()
+        full_path = request.get_full_path().lower()
         current_site = get_current_site(request)
 
         r = None
         try:
-            r = Redirect.objects.get(site=current_site, old_path=full_path)
+            r = Redirect.objects.get(source_site=current_site, source_path=full_path)
         except Redirect.DoesNotExist:
             pass
         if settings.APPEND_SLASH and not request.path.endswith('/'):
@@ -43,13 +43,14 @@ class RedirectFallbackMiddleware(object):
             path_len = len(request.path)
             full_path = full_path[:path_len] + '/' + full_path[path_len:]
             try:
-                r = Redirect.objects.get(site=current_site, old_path=full_path)
+                r = Redirect.objects.get(source_site=current_site, source_path=full_path)
             except Redirect.DoesNotExist:
                 pass
         if r is not None:
-            if r.new_path == '':
+            url = r.get_destination_url()
+            if not url:
                 return self.response_gone_class()
-            return self.response_redirect_class(r.new_path)
+            return self.response_redirect_class(url)
 
         # No redirect was found. Return the response.
         return response

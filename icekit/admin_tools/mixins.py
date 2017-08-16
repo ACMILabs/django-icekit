@@ -72,7 +72,7 @@ class HeroMixinAdmin(RawIdPreviewAdminMixin):
 
 class ListableMixinAdmin(admin.ModelAdmin):
 
-    # inlines = [RedirectInline]
+    inlines = [RedirectInline]
 
     FIELDSETS = (
         ('Advanced listing options', {

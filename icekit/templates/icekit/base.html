@@ -17,6 +17,7 @@
 				<link rel="author" href="/humans.txt" />
 
 				{% block open_graph %}
+					<meta property="og:url" content="{% block og_url %}{{ request.scheme }}://{{ request.get_host }}{{ page.get_absolute_url }}{% endblock %}">
 					<meta property="og:title" content="{% block og_title %}{{ page.get_og_title }}{% endblock %}">
 					<meta property="og:type" content="{% block og_type %}website{% endblock %}">
 					<meta property="og:image" content="{% block og_image %}{% with page.get_og_image_url as og_image %}{% if og_image %}{{ og_image|safe }}{% endif %}{% endwith %}{% endblock %}">
@@ -33,6 +34,12 @@
 				{% if debug %}
 					<meta name="robots" content="noindex">
 				{% endif %}
+
+				{% for r in page.get_redirects %}
+					<link rel="shortlink" href="{{ r.get_source_url }}">
+				{% endfor %}
+
+
 			{% endblock %}
 
 			<title>{% if request.IS_DRAFT %}PREVIEW: {% endif %}{% block title %}{% if page.get_title %}{{ page.get_title|safe }} - {% endif %}{{ SITE_NAME|safe }}{% endblock %}</title>

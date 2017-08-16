@@ -2,6 +2,7 @@ from urlparse import urljoin
 
 from django.conf import settings
 from icekit.admin_tools.utils import admin_url
+from icekit.redirects.models import Redirect
 from icekit.utils.attributes import first_of
 from unidecode import unidecode
 
@@ -131,7 +132,7 @@ class ListableMixin(models.Model):
     Optional oneliner (implement `get_oneliner()`)
 
     ...and since they show in lists, they show in search results, so
-    this model also includes search-related fields.
+    this model also includes search-related and share-related properties.
     """
     list_image = models.ImageField(
         blank=True,
@@ -218,7 +219,8 @@ class ListableMixin(models.Model):
         if li:
             from easy_thumbnails.files import get_thumbnailer
             thumb_url = get_thumbnailer(li)['og_image'].url
-            # TODO: looks like this may fail if SITE_DOMAIN = "acmi.lvh.me"
+            # TODO: looks like this may fail if SITE_DOMAIN = "*.lvh.me" -- need to check whether thumb_url has
+            # an http scheme, and also prepend a scheme to SITE_DOMAIN.
             return urljoin(settings.SITE_DOMAIN, thumb_url)
 
     def get_og_description(self):
@@ -232,6 +234,9 @@ class ListableMixin(models.Model):
     def get_admin_link(self):
         return u"<a href='{0}'>{1}</a>".format(self.get_admin_url(), self.get_title())
 
+    def get_redirects(self):
+        ctype = ContentType.objects.get_for_model(self.__class__)
+        return Redirect.objects.filter(content_type__pk = ctype.id, object_id=self.id)
 
 
 class HeroMixin(models.Model):
