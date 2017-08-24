@@ -31,6 +31,7 @@ This documentation covers the technical usage and API of GLAMkit.
 
    architecture/index
    topics/*
+   collections/*
    reference/*
    contributing/index
    changelog

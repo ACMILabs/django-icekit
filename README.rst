@@ -72,7 +72,8 @@ instead::
 
    $ bash <(curl -Ls https://raw.githubusercontent.com/ic-labs/django-icekit/develop/startproject.sh) {project_name} develop
 
-and change the icekit branch in the generated :code:`requirements-icekit.txt` from :code:`@master` to :code:`@develop`.
+and change the icekit branch in the generated :code:`requirements-icekit.txt` and :code:`Dockerfile` from
+:code:`@master` to :code:`@develop`.
 
 NOTE: Windows users should run this command in Git Bash, which comes
 with `Git for Windows <https://git-for-windows.github.io/>`__.
