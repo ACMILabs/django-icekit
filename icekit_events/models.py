@@ -439,7 +439,7 @@ class EventBase(PolymorphicModel, AbstractBaseModel, ICEkitContentsMixin,
     @cached_property
     def visible_part_ofs(self):
         # return the visible versions of any parent events
-        return filter(lambda x: x, [x.get_visible() for x in self.part_ofs.all()])
+        return self.part_ofs.visible()
 
     @cached_property
     def own_occurrences(self):
