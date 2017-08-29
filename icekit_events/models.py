@@ -6,6 +6,7 @@ Models for ``icekit_events`` app.
 from collections import OrderedDict
 from datetime import timedelta
 
+import itertools
 from colorful.fields import RGBColorField
 from dateutil import rrule
 import six
@@ -182,17 +183,20 @@ class EventBase(PolymorphicModel, AbstractBaseModel, ICEkitContentsMixin,
         help_text="Additional or internal categories: Education or members events, "
                   "for example. Events show in listings for <em>every</em> category they're associated with.",
         related_name="secondary_events"
-    ) # use all_types to get the union of primary and secondary types
+    )  # use all_types to get the union of primary and secondary types
 
-    part_of = models.ForeignKey(
+    part_ofs = models.ManyToManyField(
         'self',
+        symmetrical=False,
+        verbose_name="part of",
         blank=True,
         db_index=True,
         related_name="contained_events",
-        null=True,
-        help_text="If this event is part of another event, select it here.",
-        on_delete=models.SET_NULL
-    ) # access visible contained_events via get_children()
+        help_text="If this event is part another events, select it here.",
+    )
+    # access this data in a publishing-friendly way via the cached property `visible_part_ofs`.
+    # Use get_children() to access contained events in a publishing-friendly way.
+
     derived_from = models.ForeignKey(
         'self',
         blank=True,
@@ -433,10 +437,9 @@ class EventBase(PolymorphicModel, AbstractBaseModel, ICEkitContentsMixin,
             generator.save()
 
     @cached_property
-    def visible_part_of(self):
-        if self.part_of_id:
-            return self.part_of.get_visible()
-        return None
+    def visible_part_ofs(self):
+        # return the visible versions of any parent events
+        return filter(lambda x: x, [x.get_visible() for x in self.part_ofs.all()])
 
     @cached_property
     def own_occurrences(self):
@@ -444,31 +447,27 @@ class EventBase(PolymorphicModel, AbstractBaseModel, ICEkitContentsMixin,
         The value is returned as a list, to emphasise its cached/resolved nature.
         Manipulating a queryset would lose the benefit of caching.
 
-        :return: A list of occurrences directly attached to the event. Used to 
-        fall back to `part_of` occurrences.         
+        :return: A list of occurrences directly attached to the event. Used to
+        fall back to `part_of` occurrences.
         """
         return list(self.occurrences.all())
 
     @cached_property
     def occurrence_list(self):
         """
-        :return: A list of my occurrences, or those of my visible_part_of event
+        :return: A list of my occurrences, or those of my visible_part_of events
         """
         o = self.own_occurrences
         if o:
             return o
-        if self.visible_part_of:
-            return self.visible_part_of.occurrence_list
-        return []
+
+        return sorted(itertools.chain(*[x.occurrence_list for x in self.visible_part_ofs]))
 
     @cached_property
     def upcoming_occurrence_list(self):
         if self.own_occurrences:
             return list(self.occurrences.upcoming())
-
-        if self.visible_part_of:
-            return self.visible_part_of.upcoming_occurrence_list
-        return []
+        return sorted(itertools.chain(*[x.upcoming_occurrence_list for x in self.visible_part_ofs]))
 
     def invalidate_caches(self):
         """
@@ -476,7 +475,7 @@ class EventBase(PolymorphicModel, AbstractBaseModel, ICEkitContentsMixin,
          properties after changing occurrences.
         """
         try:
-            del self.visible_part_of
+            del self.visible_part_ofs
         except AttributeError:
             pass
 
@@ -549,7 +548,9 @@ class EventBase(PolymorphicModel, AbstractBaseModel, ICEkitContentsMixin,
         return reverse('icekit_events_eventbase_detail', args=(self.slug,))
 
     def get_children(self):
-        return EventBase.objects.filter(part_of_id=self.get_draft().id)
+        PO = self.part_ofs.through
+        ids = PO.objects.filter(to_eventbase_id=self.get_draft().id).values_list('from_eventbase_id', flat=True)
+        return EventBase.objects.filter(id__in=ids)
 
     def get_cta(self):
         if self.cta_url and self.cta_text:

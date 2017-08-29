@@ -90,7 +90,7 @@ class EventChildAdmin(
         EventRepeatGeneratorsInline,
         OccurrencesInline,
     ] + icekit_admin.ICEkitContentsAdmin.inlines
-    raw_id_fields = ('part_of', )
+    raw_id_fields = ('part_ofs', )
     save_on_top = True
     filter_horizontal = ('secondary_types', )
 
@@ -101,7 +101,7 @@ class EventChildAdmin(
                 'slug',
                 'primary_type',
                 'secondary_types',
-                'part_of',
+                'part_ofs',
                 'external_ref',
                 'location',
             ),
@@ -179,14 +179,14 @@ class EventAdmin(ChildModelPluginPolymorphicParentModelAdmin,
     list_display = (
         'primary_type_swatch', 'publishing_object_title', 'child_type_name', 'modified',
         'publishing_column',
-        'part_of_display', 'show_in_calendar', 'has_tickets_available', 'is_drop_in',
+        'part_ofs_display', 'show_in_calendar', 'has_tickets_available', 'is_drop_in',
         'occurrence_count',
         'first_occurrence', 'last_occurrence',
         # ICEkit Workflow columns
         'last_edited_by_column', 'workflow_states_column',
     )
     list_display_links = ('primary_type_swatch', 'publishing_object_title', )
-    search_fields = ('title', 'part_of__title', )
+    search_fields = ('title', 'part_ofs__title', )
 
     child_model_plugin_class = EventChildModelPlugin
     child_model_admin = EventChildAdmin
@@ -215,11 +215,11 @@ class EventAdmin(ChildModelPluginPolymorphicParentModelAdmin,
         return inst.last_occurrence
     last_occurrence.admin_order_field = 'last_occurrence'
 
-    def part_of_display(self, inst):
-        return admin_link(inst.part_of)
-    part_of_display.admin_order_field = "part_of__title"
-    part_of_display.short_description = "Part of"
-    part_of_display.allow_tags = True
+    def part_ofs_display(self, inst):
+        return "<ul>%s</ul>" % "".join(["<li>%s</li>" % admin_link(x) for x in inst.part_ofs.all()])
+    part_ofs_display.admin_order_field = "part_ofs__title"
+    part_ofs_display.short_description = "Part of"
+    part_ofs_display.allow_tags = True
 
     def get_urls(self):
         """

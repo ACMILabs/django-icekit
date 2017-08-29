@@ -5,9 +5,9 @@
 
 {% block content %}
 	<h1>{{ event.title }}</h1>
-    {% with event.part_of.get_visible as part_of %}
-        {% if part_of %}
-            <p>Part of <a href="{{ part_of.get_absolute_url}}">{{ part_of }}</a></p>
+    {% with event.visible_part_ofs as visible_part_ofs %}
+        {% if visible_part_ofs %}
+            <p>Part of {% for part_of in visible_part_ofs %}<a href="{{ part_of.get_absolute_url}}">{{ part_of }}</a>{% if not forloop.last%}, {% endif %}{% endfor %}</p>
         {% endif %}
     {% endwith %}
 	<p>Date{{ event.start_dates_set|pluralize }}: {{ event|dates_range }}</p>
