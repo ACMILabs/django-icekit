@@ -25,6 +25,9 @@ XML Analysis
 ``manage.py analyze_xml`` is a command-line tool that takes a path (or ``./``) and returns a csv file containing an
 analysis of every element in every xml file in the path. It requires the ``lxml`` library.
 
+It is very fast (analysing approx 40,000 elements per second) and memory efficient, working across arbitrarily large
+amounts of XML.
+
 Usage examples::
 
     manage.py analyze_xml --help               # show help

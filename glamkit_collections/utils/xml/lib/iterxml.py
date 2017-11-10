@@ -1,5 +1,6 @@
 """
-A pattern for iterating through a list of XML files, calling a callable at the start and end of each elem, and freeing up the memory used by that elem endwards.
+A pattern for iterating through a list of XML files, calling a callable at the start and end of each element, and
+freeing up the memory used by that element at the end.
 
 If callable returns constants.DO_NOT_DISCARD, then the memory is NOT freed up.
 
@@ -37,9 +38,6 @@ def _fast_iter(context, callable_start, callable_end, *args, **kwargs):
         _iter_count += 1
         if _iter_count % 10000 == 0:
             sys.stderr.write("processing %s elements...\n" % _iter_count)
-        # Work around bug #1185701 by bailing out after the end of the document root.
-        if elem.getparent() is None:
-            break
     del context
     return _iter_count
 

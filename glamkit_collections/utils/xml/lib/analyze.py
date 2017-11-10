@@ -1,6 +1,9 @@
 from pprint import pprint
 import sys
 import csv
+
+from icekit.utils.csv_unicode import UnicodeWriter
+
 csv_header=("path", "min_cardinality", "max_cardinality","samples", "attributes")
 from iterxml import multifile_iter_elems
 from utils import remove_ns, get_path
@@ -66,11 +69,12 @@ def _attributestring(attrdict):
 def xmlanalyze(files, sample_length=5):
     """ returns a csv of xml paths and analyzed values, showing, for example, how many records exist for every path in an xml file """
 
+    # data structure to store results
     analysis = {}
 
     multifile_iter_elems(files, analyze_start, analyze_end, sample_length=sample_length, analysis=analysis)
 
-    writer = csv.writer(sys.stdout)
+    writer = UnicodeWriter(sys.stdout)
     writer.writerow(csv_header)
 
     listanalysis = [x for x in analysis.iteritems()]
